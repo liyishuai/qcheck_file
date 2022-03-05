@@ -1,0 +1,3 @@
+(test
+ (name qcheck_file)
+ (libraries qcheck_file qcheck-core.runner))
