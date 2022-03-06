@@ -4,8 +4,9 @@ include Sys
 
 let genUpper = Gen.char_range 'A' 'Z'
 let genLower = Gen.char_range 'a' 'z'
-let genFilechar = Gen.(oneof [ genUpper; genLower; numeral; pure '_' ])
+let genFilechar = Gen.(oneof [ genLower; genUpper; numeral; pure '_' ])
 let genFilename = Gen.(string_size ~gen:genFilechar (int_range 1 10))
+let genFilename2 = Gen.(string_size ~gen:genFilechar (int_range 2 10))
 
 let testdir base (dir, file, content) =
   let dirpath = concat base dir in
@@ -40,7 +41,7 @@ let testfile base (file, content) =
     prerr_endline msg;
     false
 
-let testunison base (a, b, file, content) =
+let testunison base (a, b, file, (content1, content2)) =
   let adir = concat base a in
   let bdir = concat base b in
   let unison =
@@ -50,25 +51,29 @@ let testunison base (a, b, file, content) =
   try
     FileUtil.rm ~force:Force ~recurse:true [ adir; bdir ];
     FileUtil.mkdir adir;
-    FileUtil.mkdir adir;
+    FileUtil.mkdir bdir;
     if command unison != 0 then (
-      print_endline "first unison failed";
+      print_endline ("0th unison failed: " ^ unison);
       false)
     else
       let apath = concat adir file in
-      let oc = open_out apath in
-      output_string oc content;
-      close_out oc;
+      let oc1 = open_out apath in
+      output_string oc1 content1;
+      close_out oc1;
       if command unison != 0 then (
-        print_endline "second unison failed";
+        print_endline "1st unison failed";
         false)
-      else
+      else (
         let bpath = concat bdir file in
-        remove bpath;
-        if command unison != 0 then (
-          print_endline "third unison failed";
+        let oc2 = open_out bpath in
+        output_string oc2 content2;
+        close_out oc2;
+        remove apath;
+        let ret = command unison in
+        if ret != 1 then (
+          print_endline ("2nd unison returned " ^ Print.int ret);
           false)
-        else true
+        else true)
   with e ->
     print_endline (Printexc.to_string e);
     false

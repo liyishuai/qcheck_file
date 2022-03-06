@@ -20,8 +20,8 @@ let testsuite =
       (Gen.pair genFilename genFilename)
       (testfile tmpdir); *)
     Test.make ~name:"testunison"
-      ~print:Print.(quad string string string string)
-      (Gen.quad genFilename genFilename genFilename genFilename)
+      ~print:Print.(quad string string string (pair string string))
+      Gen.(quad genFilename genFilename2 genFilename (pair genFilename genFilename))
       (testunison tmpdir);
   ]
 ;;
