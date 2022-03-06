@@ -40,36 +40,35 @@ let testfile base (file, content) =
     prerr_endline msg;
     false
 
-let testunison base (a, b, dir) =
-  let apath = concat base a in
-  let bpath = concat base b in
+let testunison base (a, b, file, content) =
+  let adir = concat base a in
+  let bdir = concat base b in
   let unison =
-    "unison " ^ apath ^ " " ^ bpath
+    "unison " ^ adir ^ " " ^ bdir
     ^ " -batch -confirmbigdel=false > logs.txt 2> error.txt"
   in
   try
-    FileUtil.rm ~force:Force ~recurse:true [ apath; bpath ];
-    FileUtil.mkdir apath;
-    FileUtil.mkdir bpath;
+    FileUtil.rm ~force:Force ~recurse:true [ adir; bdir ];
+    FileUtil.mkdir adir;
+    FileUtil.mkdir adir;
     if command unison != 0 then (
       print_endline "first unison failed";
       false)
     else
-      let adir = concat apath dir in
-      let bdir = concat bpath dir in
-      mkdir adir 0x755;
+      let apath = concat adir file in
+      let oc = open_out apath in
+      output_string oc content;
+      close_out oc;
       if command unison != 0 then (
         print_endline "second unison failed";
         false)
-      else (
-        prerr_endline (a ^ " " ^ b ^ " " ^ dir);
-        try
-          mkdir bdir 0o755;
-          print_endline "unexpected success";
-          false
-        with _ ->
-          print_endline "as expected";
-          true)
+      else
+        let bpath = concat bdir file in
+        remove bpath;
+        if command unison != 0 then (
+          print_endline "third unison failed";
+          false)
+        else true
   with e ->
     print_endline (Printexc.to_string e);
     false

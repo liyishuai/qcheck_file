@@ -11,17 +11,17 @@ print_endline tmpdir
 
 let testsuite =
   [
-    Test.make ~name:"testdir"
+    (* Test.make ~name:"testdir"
       ~print:Print.(triple string string string)
       (Gen.triple genFilename genFilename genFilename)
       (testdir tmpdir);
     Test.make ~name:"testfile"
       ~print:Print.(pair string string)
       (Gen.pair genFilename genFilename)
-      (testfile tmpdir);
+      (testfile tmpdir); *)
     Test.make ~name:"testunison"
-      ~print:Print.(triple string string string)
-      (Gen.triple genFilename genFilename genFilename)
+      ~print:Print.(quad string string string string)
+      (Gen.quad genFilename genFilename genFilename genFilename)
       (testunison tmpdir);
   ]
 ;;
