@@ -17,4 +17,4 @@
  (name qcheck_file)
  (synopsis "Testing file operation")
  (description "Property-based testing of OCaml file system API.")
- (depends ocaml dune qcheck))
+ (depends ocaml dune qcheck fileutils))

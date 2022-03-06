@@ -11,6 +11,7 @@ depends: [
   "ocaml"
   "dune" {>= "3.0"}
   "qcheck"
+  "fileutils"
   "odoc" {with-doc}
 ]
 build: [

@@ -6,21 +6,24 @@ include Sys
 
 let tmpdir = concat (get_temp_dir_name ()) "qcheck_file";;
 
-try mkdir tmpdir 0o755 with Sys_error msg -> prerr_endline msg;;
+FileUtil.mkdir tmpdir;;
 print_endline tmpdir
 
 let testsuite =
   [
-    Test.make
+    Test.make ~name:"testdir"
       ~print:Print.(triple string string string)
       (Gen.triple genFilename genFilename genFilename)
       (testdir tmpdir);
-    Test.make
+    Test.make ~name:"testfile"
       ~print:Print.(pair string string)
       (Gen.pair genFilename genFilename)
       (testfile tmpdir);
+    Test.make ~name:"testunison"
+      ~print:Print.(triple string string string)
+      (Gen.triple genFilename genFilename genFilename)
+      (testunison tmpdir);
   ]
 ;;
 
-run_tests testsuite;;
-rmdir tmpdir
+run_tests ~long:true testsuite
